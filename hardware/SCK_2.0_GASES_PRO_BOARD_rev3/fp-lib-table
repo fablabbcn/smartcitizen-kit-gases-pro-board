@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name Hangar)(type Eagle)(uri /home/jano/Projects/MID_APosada/SmartCitizen/toxic_sensor_V3/lib_ea/Hangar.lbr)(options "")(descr ""))
+  (lib (name Hangar_s)(type Eagle)(uri /home/jano/Projects/MID_APosada/SmartCitizen/toxic_sensor_V2/Hangar.lbr)(options "")(descr ""))
+  (lib (name SeeedOPL-Connector-2016)(type KiCad)(uri "/home/jano/kicad_lib/SeeedOPL for Kicad-alpha-2017-01-02/SeeedOPL-Connector-2016.pretty")(options "")(descr ""))
+)

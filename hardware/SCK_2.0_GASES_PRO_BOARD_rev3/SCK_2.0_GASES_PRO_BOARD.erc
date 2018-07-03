@@ -1,0 +1,9 @@
+ERC report (Mon 23 Jan 2017 05:44:24 PM CET, Encoding UTF8 )
+
+***** Sheet /
+ErrType(3): Pin connected to some others pins but no pin to drive it
+    @ (59,69 mm,196,85 mm): Pin 1 (Power input) of component #PWR017 is not driven (Net 1).
+ErrType(3): Pin connected to some others pins but no pin to drive it
+    @ (105,41 mm,355,60 mm): Pin 1 (Power input) of component #PWR090 is not driven (Net 4).
+
+ ** ERC messages: 2  Errors 0  Warnings 2
