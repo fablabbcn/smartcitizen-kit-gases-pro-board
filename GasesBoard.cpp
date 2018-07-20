@@ -138,6 +138,33 @@ uint8_t GasesBoard::readByte(uint8_t dataAddress)
 	if(!auxWire.requestFrom(eepromAddress, 1)) return 0;
 	return auxWire.read();
 }
+bool GasesBoard::I2Cdetect(TwoWire *_Wire, byte address)
+{
+	_Wire->beginTransmission(address);
+	byte error = _Wire->endTransmission();
+
+	if (error == 0) return true;
+	else return false;
+}
+void GasesBoard::writeI2C(byte deviceaddress, byte instruction, byte data )
+{
+	auxWire.beginTransmission(deviceaddress);
+	auxWire.write(instruction);
+	auxWire.write(data);
+	auxWire.endTransmission();
+}
+byte GasesBoard::readI2C(byte deviceaddress, byte instruction)
+{
+	byte  data = 0x0000;
+	auxWire.beginTransmission(deviceaddress);
+	auxWire.write(instruction);
+	auxWire.endTransmission();
+	auxWire.requestFrom(deviceaddress,1);
+	unsigned long time = millis();
+	while (!auxWire.available()) if ((millis() - time)>500) return 0x00;
+	data = auxWire.read();
+	return data;
+}
 
 #ifdef gasesBoardTest
 void GasesBoard::runTester(uint8_t wichSlot)
@@ -237,13 +264,6 @@ bool GasesBoard::autoTest()
 	Electrode wichElectrode_W;
 	Electrode wichElectrode_A;
 
-	pinMode(pinBLUE, OUTPUT);
-	pinMode(pinGREEN, OUTPUT);
-	pinMode(pinRED, OUTPUT);
-	digitalWrite(pinGREEN, HIGH);
-	digitalWrite(pinRED, HIGH);
-	digitalWrite(pinBLUE, LOW);
-
 	// Autoselect slot based on response (if none responds it fails)
 	for (uint8_t i=1; i<4; i++) {
 		switch(i) {
@@ -261,7 +281,6 @@ bool GasesBoard::autoTest()
 		}
 	}
 	uint8_t multiplier = 25;
-	bool blueState = false;
 	for (int16_t i=-1400; i<1400; i+=multiplier) {
 
 		tester.setCurrent(tester.electrode_W, i);
@@ -283,13 +302,113 @@ bool GasesBoard::autoTest()
 		}
 
 		SerialUSB.print(".");
-		digitalWrite(pinBLUE, blueState);
-		blueState = !blueState;
 	}
 	if (maxErrorsW > 0 && maxErrorsA > 0) {
 		SerialUSB.println("\r\nTest OK");
 		return true;
 	}
+	return false;
 }
 #endif
+
+Gases_SHT31::Gases_SHT31(TwoWire *localWire)
+{
+	_Wire = localWire;
+}
+bool Gases_SHT31::begin()
+{
+	_Wire->begin();
+	_Wire->beginTransmission(address);
+	byte error = _Wire->endTransmission();
+	if (error != 0) return false;
+
+	delay(1); 		// In case the device was off
+	sendComm(SOFT_RESET); 	// Send reset command
+	delay(50); 		// Give time to finish reset
+	update(true);
+
+	return true;
+}
+bool Gases_SHT31::stop()
+{
+	// It will go to idle state by itself after 1ms
+	return true;
+}
+bool Gases_SHT31::update(bool wait)
+{
+	uint32_t elapsed = millis() - lastTime;
+	if (elapsed < timeout) delay(timeout - elapsed);
+
+	uint8_t readbuffer[6];
+	sendComm(SINGLE_SHOT_HIGH_REP);
+
+	_Wire->requestFrom(address, (uint8_t)6);
+	// Wait for answer (datasheet says 15ms is the max)
+	uint32_t started = millis();
+	while(_Wire->available() != 6) {
+		if (millis() - started > timeout) return 0;
+	}
+
+	// Read response
+	for (uint8_t i=0; i<6; i++) readbuffer[i] = _Wire->read();
+
+	uint16_t ST, SRH;
+	ST = readbuffer[0];
+	ST <<= 8;
+	ST |= readbuffer[1];
+
+	// Check Temperature crc
+	if (readbuffer[2] != crc8(readbuffer, 2)) return false;
+	SRH = readbuffer[3];
+	SRH <<= 8;
+	SRH |= readbuffer[4];
+
+	// check Humidity crc
+	if (readbuffer[5] != crc8(readbuffer+3, 2)) return false;
+	double temp = ST;
+	temp *= 175;
+	temp /= 0xffff;
+	temp = -45 + temp;
+	temperature = (float)temp;
+
+	double shum = SRH;
+	shum *= 100;
+	shum /= 0xFFFF;
+	humidity = (float)shum;
+
+	lastTime = millis();
+
+	return true;
+}
+void Gases_SHT31::sendComm(uint16_t comm)
+{
+	_Wire->beginTransmission(address);
+	_Wire->write(comm >> 8);
+	_Wire->write(comm & 0xFF);
+	_Wire->endTransmission();
+}
+uint8_t Gases_SHT31::crc8(const uint8_t *data, int len)
+{
+
+	/* CRC-8 formula from page 14 of SHT spec pdf */
+
+	/* Test data 0xBE, 0xEF should yield 0x92 */
+
+	/* Initialization data 0xFF */
+	/* Polynomial 0x31 (x8 + x5 +x4 +1) */
+	/* Final XOR 0x00 */
+
+	const uint8_t POLYNOMIAL(0x31);
+	uint8_t crc(0xFF);
+
+	for ( int j = len; j; --j ) {
+		crc ^= *data++;
+		for ( int i = 8; i; --i ) {
+			crc = ( crc & 0x80 )
+				? (crc << 1) ^ POLYNOMIAL
+				: (crc << 1);
+		}
+	}
+	return crc;
+}
 
