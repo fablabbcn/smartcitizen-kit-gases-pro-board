@@ -3,7 +3,7 @@
 #include <MCP342X.h>
 
 // Gases Board Tester
-#define gasesBoardTest 0	// Uncomment for testing SCK Gases Board board manually, and for auto test also set it to 1
+/* #define gasesBoardTest 0	// Uncomment for testing SCK Gases Board board manually, and for auto test also set it to 1 */
 #ifdef gasesBoardTest
 #include "GasesBoardTester.h"
 #endif
