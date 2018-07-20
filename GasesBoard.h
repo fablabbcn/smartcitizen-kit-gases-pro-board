@@ -97,8 +97,8 @@ class GasesBoard
 		// Alphasense Sensors (Slot 1,2 and 3)
 		const uint8_t initGain = 0; 	// (0->gain of 1, 1->gain of 2, 2->gain of 3 or 3->gain of 8)
 		const float ohmsPerStep = 392.1568;     // Resistor conversion constant in Ohms. (100,000 / 255)
-		MCP342X ADC_1 = MCP342X(0x69);
-		MCP342X ADC_2_3 = MCP342X(0x68);
+		MCP342X ADC_1 = MCP342X(0x69, &auxWire);
+		MCP342X ADC_2_3 = MCP342X(0x68, &auxWire);
 
 		// Slot 1 sensor
 		gasesBoardSensor Slot1 = {
