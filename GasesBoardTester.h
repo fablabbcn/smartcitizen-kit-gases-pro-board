@@ -4,8 +4,8 @@
 #include <Wire.h>
 
 // Uncomment the right include depending opn wich tester board you are using
-#define USED_BOARD_LOOKUP "currentLookUp_Board_0.h"
-/* #define USED_BOARD_LOOKUP "currentLookUp_Board_1.h" */
+/* #define USED_BOARD_LOOKUP "currentLookUp_Board_0.h" */
+#define USED_BOARD_LOOKUP "currentLookUp_Board_1.h"
 /* #define USED_BOARD_LOOKUP "currentLookUp_Board_2.h" */
 /* #define USED_BOARD_LOOKUP "currentLookUp_Board_3.h" */
 

@@ -2,17 +2,15 @@
 
 bool GasesBoard::begin()
 {
-
-	if (!I2Cdetect(&auxWire, sht31Address) ||
-			!(I2Cdetect(&auxWire, Slot1.electrode_A.resistor.address)) ||
-			!(I2Cdetect(&auxWire, Slot1.electrode_W.resistor.address)) ||
-			!(I2Cdetect(&auxWire, Slot2.electrode_A.resistor.address)) ||
-			!(I2Cdetect(&auxWire, Slot2.electrode_W.resistor.address)) ||
-			!(I2Cdetect(&auxWire, Slot3.electrode_A.resistor.address)) ||
-			!(I2Cdetect(&auxWire, Slot3.electrode_W.resistor.address))) return false;
-
 	if (alreadyStarted) return true;
-	alreadyStarted = true;
+
+	if (!I2Cdetect(sht31Address) ||
+			!(I2Cdetect(Slot1.electrode_A.resistor.address)) ||
+			!(I2Cdetect(Slot1.electrode_W.resistor.address)) ||
+			!(I2Cdetect(Slot2.electrode_A.resistor.address)) ||
+			!(I2Cdetect(Slot2.electrode_W.resistor.address)) ||
+			!(I2Cdetect(Slot3.electrode_A.resistor.address)) ||
+			!(I2Cdetect(Slot3.electrode_W.resistor.address))) return false;
 
 	sht31.begin();
 
@@ -23,6 +21,8 @@ bool GasesBoard::begin()
 	setPot(Slot2.electrode_W, 0);
 	setPot(Slot3.electrode_A, 0);
 	setPot(Slot3.electrode_W, 0);
+
+	alreadyStarted = true;
 
 	return true;
 }
@@ -124,45 +124,45 @@ String GasesBoard::getUID()
 }
 bool GasesBoard::writeByte(uint8_t dataAddress, uint8_t data)
 {
-	auxWire.beginTransmission(eepromAddress);
-	auxWire.write(dataAddress);
-	auxWire.write(data);
-	if (auxWire.endTransmission() == 0) return true;
+	WIRE.beginTransmission(eepromAddress);
+	WIRE.write(dataAddress);
+	WIRE.write(data);
+	if (WIRE.endTransmission() == 0) return true;
 	return false;
 }
 uint8_t GasesBoard::readByte(uint8_t dataAddress)
 {
-	auxWire.beginTransmission(eepromAddress);
-	auxWire.write(dataAddress);
-	if (auxWire.endTransmission(false)) return 0;
-	if(!auxWire.requestFrom(eepromAddress, 1)) return 0;
-	return auxWire.read();
+	WIRE.beginTransmission(eepromAddress);
+	WIRE.write(dataAddress);
+	if (WIRE.endTransmission(false)) return 0;
+	if(!WIRE.requestFrom(eepromAddress, 1)) return 0;
+	return WIRE.read();
 }
-bool GasesBoard::I2Cdetect(TwoWire *_Wire, byte address)
+bool GasesBoard::I2Cdetect(byte address)
 {
-	_Wire->beginTransmission(address);
-	byte error = _Wire->endTransmission();
+	WIRE.beginTransmission(address);
+	byte error = WIRE.endTransmission();
 
 	if (error == 0) return true;
 	else return false;
 }
 void GasesBoard::writeI2C(byte deviceaddress, byte instruction, byte data )
 {
-	auxWire.beginTransmission(deviceaddress);
-	auxWire.write(instruction);
-	auxWire.write(data);
-	auxWire.endTransmission();
+	WIRE.beginTransmission(deviceaddress);
+	WIRE.write(instruction);
+	WIRE.write(data);
+	WIRE.endTransmission();
 }
 byte GasesBoard::readI2C(byte deviceaddress, byte instruction)
 {
 	byte  data = 0x0000;
-	auxWire.beginTransmission(deviceaddress);
-	auxWire.write(instruction);
-	auxWire.endTransmission();
-	auxWire.requestFrom(deviceaddress,1);
+	WIRE.beginTransmission(deviceaddress);
+	WIRE.write(instruction);
+	WIRE.endTransmission();
+	WIRE.requestFrom(deviceaddress,1);
 	unsigned long time = millis();
-	while (!auxWire.available()) if ((millis() - time)>500) return 0x00;
-	data = auxWire.read();
+	while (!WIRE.available()) if ((millis() - time)>500) return 0x00;
+	data = WIRE.read();
 	return data;
 }
 

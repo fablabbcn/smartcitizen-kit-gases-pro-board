@@ -2,13 +2,22 @@
 
 #include <MCP342X.h>
 
-// Gases Board Tester
-/* #define gasesBoardTest 0	// Uncomment for testing SCK Gases Board board manually, and for auto test also set it to 1 */
+#define SCKVER 20 // If the library is going to be used in SCK 2.0 uncoment this line
+/* #define SCKVER 15 // If the library is going to be used in SCK 1.5 uncoment this line */
+
+// Gases Board Tester (Only supported in version 2.0 and greater)
+/* #define gasesBoardTest 	// Uncomment for enabling tester board support (remember selecting board lookup table in GasesBoardTester.h) */
+
+#if SCKVER>15
+extern TwoWire auxWire;
+#define WIRE auxWire
 #ifdef gasesBoardTest
 #include "GasesBoardTester.h"
 #endif
 
-extern TwoWire auxWire;
+#else
+#define WIRE Wire
+#endif
 
 // Temperature and Humidity
 class Gases_SHT31
@@ -88,7 +97,7 @@ class GasesBoard
 		const byte sht31Address = 0x44;
 
 		// Adafruit_SHT31 sht31 = Adafruit_SHT31();
-		Gases_SHT31 sht31 = Gases_SHT31(&auxWire);
+		Gases_SHT31 sht31 = Gases_SHT31(&WIRE);
 
 		float getTemperature();
 		float getHumidity();
@@ -97,8 +106,8 @@ class GasesBoard
 		// Alphasense Sensors (Slot 1,2 and 3)
 		const uint8_t initGain = 0; 	// (0->gain of 1, 1->gain of 2, 2->gain of 3 or 3->gain of 8)
 		const float ohmsPerStep = 392.1568;     // Resistor conversion constant in Ohms. (100,000 / 255)
-		MCP342X ADC_1 = MCP342X(0x69, &auxWire);
-		MCP342X ADC_2_3 = MCP342X(0x68, &auxWire);
+		MCP342X ADC_1 = MCP342X(0x69, &WIRE);
+		MCP342X ADC_2_3 = MCP342X(0x68, &WIRE);
 
 		// Slot 1 sensor
 		gasesBoardSensor Slot1 = {
@@ -152,7 +161,7 @@ class GasesBoard
 		// EEPROM 24AA025
 		const byte eepromAddress = 0x51;
 
-		bool I2Cdetect(TwoWire *_Wire, byte address);
+		bool I2Cdetect(byte address);
 		void writeI2C(byte deviceaddress, byte instruction, byte data );
 		byte readI2C(byte deviceaddress, byte instruction);
 
