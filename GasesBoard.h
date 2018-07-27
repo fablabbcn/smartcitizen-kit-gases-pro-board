@@ -44,7 +44,7 @@ class Gases_SHT31
 
 		float temperature;
 		float humidity;
-		bool begin();
+		bool start();
 		bool stop();
 		bool update(bool wait=true);
 };
@@ -90,7 +90,8 @@ class GasesBoard
 	public:
 
 		// Init functions
-		bool begin();
+		bool start();
+		bool stop();
 		bool alreadyStarted = false;
 
 		// SHT31 Temperature and Humidity Sensor

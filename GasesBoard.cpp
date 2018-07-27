@@ -1,6 +1,6 @@
 #include <GasesBoard.h>
 
-bool GasesBoard::begin()
+bool GasesBoard::start()
 {
 	if (alreadyStarted) return true;
 
@@ -12,7 +12,7 @@ bool GasesBoard::begin()
 			!(I2Cdetect(Slot3.electrode_A.resistor.address)) ||
 			!(I2Cdetect(Slot3.electrode_W.resistor.address))) return false;
 
-	sht31.begin();
+	sht31.start();
 
 	// Set all potentiometers to 0
 	setPot(Slot1.electrode_A, 0);
@@ -24,6 +24,13 @@ bool GasesBoard::begin()
 
 	alreadyStarted = true;
 
+	return true;
+}
+
+bool GasesBoard::stop()
+{
+	sht31.stop();
+	// TODO minimize power consumption
 	return true;
 }
 
@@ -315,7 +322,7 @@ Gases_SHT31::Gases_SHT31(TwoWire *localWire)
 {
 	_Wire = localWire;
 }
-bool Gases_SHT31::begin()
+bool Gases_SHT31::start()
 {
 	_Wire->begin();
 	_Wire->beginTransmission(address);
