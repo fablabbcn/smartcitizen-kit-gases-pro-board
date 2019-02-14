@@ -41,3 +41,7 @@ All the software unless stated is released under [GNU GPL v3.0](https://github.c
 ## Credits
 
 Smart Citizen Team 2012-18
+
+## Funding
+
+This work has received funding from the European Union's Horizon 2020 research and innovation program under the grant agreement [No. 689954](https://cordis.europa.eu/project/rcn/202639_en.html)
