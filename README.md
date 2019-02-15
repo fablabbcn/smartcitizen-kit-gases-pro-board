@@ -1,4 +1,7 @@
-# Smart Citizen Kit 2.0 Gases Pro Board [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
+# Smart Citizen Kit 2.0 Gases Pro Board 
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)]()
+[![DOI](https://zenodo.org/badge/139605832.svg)](https://zenodo.org/badge/latestdoi/139605832)
 
 ![alt text](https://cdn.rawgit.com/fablabbcn/smartcitizen-kit-gases-pro-board/f2834941/gases_pro_board.png "Gases Pro Board")
 
